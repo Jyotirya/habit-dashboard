@@ -5,9 +5,13 @@ import leftarrow from '../pages/icons/reshot-icon-chevron-arrow-left-circle-XY6M
 import rightarrow from '../pages/icons/reshot-icon-chevron-arrow-right-circle-C23LFHP5TK.svg';
 import cross from '../pages/icons/cross-svgrepo-com.svg';
 import dot from '../pages/icons/dot-svgrepo-com.svg';
-
+import { AuthContext } from '../component/AuthContext';
+import axios from 'axios';
+import { useContext } from 'react';
+import { useEffect } from 'react';
 
 function Week() {
+    const { token } = useContext(AuthContext);
     const todaydate = new Date();
     const [ptodaydate, setptodaydate] = useState(todaydate);
     const pday = ptodaydate.getDay();
@@ -17,6 +21,67 @@ function Week() {
     enddate.setDate(ptodaydate.getDate() - pday + 7);
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const Token = token.token;
+
+    const startonlydate = startdate.getDate() > 9 ? startdate.getDate() : `0${startdate.getDate()}`;
+    const startonlymonth = startdate.getMonth() + 1 > 9 ? startdate.getMonth() + 1 : `0${startdate.getMonth() + 1}`;
+    const endonlydate = enddate.getDate() > 9 ? enddate.getDate() : `0${enddate.getDate()}`;
+    const endonlymonth = enddate.getMonth() + 1 > 9 ? enddate.getMonth() + 1 : `0${enddate.getMonth() + 1}`;
+    const startDate = `${startdate.getFullYear()}-${startonlymonth}-${startonlydate}`;
+    const endDate = `${enddate.getFullYear()}-${endonlymonth}-${endonlydate}`;
+    const [total, setTotal] = useState(0);
+    const [present, setPresent] = useState(0);
+
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `token ${Token}`,
+    };
+
+    const body = {
+        start_date: startDate,
+        end_date: endDate,
+    };
+    const [data, setdata] = useState([]);
+    const [allhabitlist, setAllHabitList] = useState([]);
+    useEffect(() => {
+        axios.post('http://localhost:8000/api/habits/calendar', body, { headers })
+            .then(response => {
+                console.log('Data fetched successfully:', response.data.data);
+                setdata(response.data.data);
+
+                const newAllHabitList = [];
+                for (let i = 0; i < 7; i++) {
+                    if (response.data.data[i] && response.data.data[i].habits) {
+                        response.data.data[i].habits.forEach((habit) => {
+                            if (!newAllHabitList.find(h => h.habit_id === habit.habit_id)) {
+                                newAllHabitList.push(habit);
+                            }
+                        });
+                    }
+                }
+                setAllHabitList(newAllHabitList);
+                let totalCount = 0;
+                let presentCount = 0;
+                response.data.data.forEach(day => {
+                    if (day && day.habits) {
+                        day.habits.forEach(habit => {
+                            totalCount++;
+                            if (habit.completed) {
+                                presentCount++;
+                            }
+                        });
+                    }
+                });
+                setTotal(totalCount);
+                setPresent(presentCount);
+
+            })
+            .catch(error => {
+                const errorMessage = Object.values(error.response.data);
+                console.error('Error fetching data:', errorMessage);
+            });
+    }, [Token, ptodaydate]);
 
     const extractdates = () => {
         const enddatee = enddate.getDate();
@@ -47,82 +112,42 @@ function Week() {
             </div>
         );
     };
-
-   
+    const find = (habit, day) => {
+        return day.habits.find(h => h.habit_id == habit.habit_id);
+    }
+    const getClasstd = (day, habit) => {
+        if (find(habit, day)) {
+            const dateString = day.date;
+            const [year, month, dayy] = dateString.split('-').map(Number);
+            if (todaydate.getFullYear() < year || todaydate.getMonth() + 1 < month || todaydate.getDate() < dayy) {
+                return styles.notday;
+            }
+            else if (find(habit, day).completed) {
+                return styles.tabledatacompleted;
+            }
+            else return styles.tabledatanotcompleted;
+        }
+        else return styles.notpresent;
+    }
 
     const Habitweekdisplay = () => {
-        const data = [
-            [{ name: "Go for a run", type: "positive", checked: false, days: [1,3,4]},
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Go for a run", type: "positive", checked: true },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },],
-            [{ name: "Go for a run", type: "positive", checked: true },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Go for a run", type: "positive", checked: true },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },],
-            [{ name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Go for a run", type: "positive", checked: true },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },],
-            [{ name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Go for a run", type: "positive", checked: true },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false },],
-            [{ name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false },],
-            [{ name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: true }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },],
-            [{ name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: false },
-            { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: true }, { name: "Go for a run", type: "positive", checked: false },
-            { name: "Read a book", type: "negative", checked: true },
-            { name: "Eat a healthy meal", type: "positive", checked: false },
-            { name: "Eat a healthy meal", type: "positive", checked: false },]
-        ];
 
-        const length = data[0].length;
+
+        const length = allhabitlist.length;
         const arraynumber = [];
         for (let i = 0; i < length; i++) {
             arraynumber.push(i);
         }
 
+
+
         const tablerows = arraynumber.map((i) => {
             return (
                 <tr key={i} className={styles.row}>
-                    <td className={styles.tabledata}>{data[0][i].type == "positive" ? <img src={dot} className={styles.icons}></img> : <img src={cross} className={styles.icons}></img>}</td>
-                    <td className={styles.name}>{data[0][i].name}</td>
+                    <td className={styles.tabledata}>{<img src={dot} className={styles.icons}></img>}</td>
+                    <td className={styles.name}>{allhabitlist[i].habit_name}</td>
                     {data.map((day, dayIndex) => (
-                        <td key={dayIndex} className={styles.tabledata} style={day[i].checked ? { backgroundColor: 'black' } : { backgroundColor: 'white' }}>
+                        <td key={dayIndex} className={getClasstd(day, allhabitlist[i])} >
                         </td>
                     ))}
                 </tr>
@@ -158,10 +183,9 @@ function Week() {
                     <div className={styles.actualdate}>{extractdates()}</div>
                     <img src={rightarrow} alt="->" className={styles.icon} onClick={handlerightarrowclick} />
                 </div>
-                <ProgressBar progress='50' />
+                <ProgressBar progress={Math.round((present / total) * 100)} />
             </div>
             <hr className={styles.hr}></hr>
-
             <div className={styles.bottombar}>
                 <Habitweekdisplay />
             </div>

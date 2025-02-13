@@ -11,7 +11,6 @@ function Habits() {
     const [middledate, setmiddledate] = useState(todaydate);
     const [selecteddate, setselecteddate] = useState(todaydate);
     const [menuVisible, setMenuVisible] = useState(null);
-    const [completed, setcompleted] = useState('');
     const [habitList, sethabitList] = useState([]);
 
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -107,7 +106,6 @@ function Habits() {
     const handleCheckClick = (index) => {
         const newCompletedStatus = !habitList[index].completed;
         const used= newCompletedStatus ? "True"  : "False";
-        console.log(used);
         const bodycheck = {
             date: startDate,
             completed: used,
@@ -177,6 +175,17 @@ function Habits() {
         );
     };
 
+    const calculateprogress = () => {
+        let x=0;
+        const length = habitList.length;
+        for(let i=0 ; i<length ; i++){
+            if(habitList[i].completed){
+                x=x+1;
+            }
+        }
+        return x/length*100;
+    }
+
     return (
         <div className={styles.main}>
             <div className={styles.sideBarCalendar}>
@@ -203,7 +212,7 @@ function Habits() {
                         </ul>
                     </div>
                 </div>
-                <ProgressBar progress='37' />
+                <ProgressBar progress={calculateprogress()} />
             </div>
         </div>
     );
