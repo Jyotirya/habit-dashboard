@@ -10,8 +10,10 @@ import axios from 'axios';
 import { useContext } from 'react';
 import { useEffect } from 'react';
 
+
 function Week() {
     const { token } = useContext(AuthContext);
+    const {update} = useContext(AuthContext);
     const todaydate = new Date();
     const [ptodaydate, setptodaydate] = useState(todaydate);
     const pday = ptodaydate.getDay();
@@ -81,7 +83,7 @@ function Week() {
                 const errorMessage = Object.values(error.response.data);
                 console.error('Error fetching data:', errorMessage);
             });
-    }, [Token, ptodaydate]);
+    }, [Token, ptodaydate, update]);
 
     const extractdates = () => {
         const enddatee = enddate.getDate();
@@ -119,7 +121,7 @@ function Week() {
         if (find(habit, day)) {
             const dateString = day.date;
             const [year, month, dayy] = dateString.split('-').map(Number);
-            if (todaydate.getFullYear() < year || todaydate.getMonth() + 1 < month || todaydate.getDate() < dayy) {
+            if (todaydate.getFullYear() < year || (todaydate.getFullYear() == year && (todaydate.getMonth() + 1 < month ||( todaydate.getMonth() + 1 == month && todaydate.getDate() < dayy)))) {
                 return styles.notday;
             }
             else if (find(habit, day).completed) {
@@ -183,7 +185,7 @@ function Week() {
                     <div className={styles.actualdate}>{extractdates()}</div>
                     <img src={rightarrow} alt="->" className={styles.icon} onClick={handlerightarrowclick} />
                 </div>
-                <ProgressBar progress={Math.round((present / total) * 100)} />
+                <ProgressBar progress= {Math.round((present / total) * 100) ? Math.round((present / total) * 100): 0} />
             </div>
             <hr className={styles.hr}></hr>
             <div className={styles.bottombar}>
@@ -193,4 +195,4 @@ function Week() {
     );
 }
 
-export default Week; 
+export default Week;

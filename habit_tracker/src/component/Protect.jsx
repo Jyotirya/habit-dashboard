@@ -4,9 +4,8 @@ import { AuthContext } from './AuthContext';
 
 const ProtectedRoute = ({ element}) => {
     const { token } = useContext(AuthContext);
-
     return (
-             element
+             token? element : <Navigate to="/login" />
     );
 };
 

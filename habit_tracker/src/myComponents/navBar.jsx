@@ -14,8 +14,7 @@ import { MdAnalytics } from "react-icons/md";
 import { AuthContext } from '../component/AuthContext';
 import { useContext } from 'react';
 
-
-function NavBar(input) {
+function NavBar(input1) {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
   const [showprofile, setshowprofile] = useState(false);
@@ -25,7 +24,6 @@ function NavBar(input) {
       setshowprofile(true);
     }
   };
-
   const handleCloseProfile = () => {
     setshowprofile(false);
   };
@@ -38,10 +36,9 @@ function NavBar(input) {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    window.location.reload();
   };
   const setClassdash = () => {
-    if (input.input === "dashboard") {
+    if (input1.input === "dashboard") {
       return styles.DashBoardselected;
     }
     else {
@@ -49,7 +46,7 @@ function NavBar(input) {
     }
   }
   const setClassAna = () => {
-    if (input.input === "analytics") {
+    if (input1.input === "analytics") {
       return styles.DashBoardselected;
     }
     else {

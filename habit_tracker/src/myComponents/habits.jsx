@@ -15,6 +15,8 @@ function Habits() {
 
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const { token } = useContext(AuthContext);
+    const { update } = useContext(AuthContext);
+    const { setUpdate } = useContext(AuthContext);
 
     const startonlydate = selecteddate.getDate() > 9 ? selecteddate.getDate() : `0${selecteddate.getDate()}`;
     const startonlymonth = selecteddate.getMonth() + 1 > 9 ? selecteddate.getMonth() + 1 : `0${selecteddate.getMonth() + 1}`;
@@ -101,7 +103,7 @@ function Habits() {
                 const errorMessage = Object.values(error.response.data);
                 console.error('Error fetching data:', errorMessage);
             });
-    }, [selecteddate, startDate, Token,]);
+    }, [selecteddate, startDate, Token,update]);
 
     const handleCheckClick = (index) => {
         const newCompletedStatus = !habitList[index].completed;
@@ -117,6 +119,7 @@ function Habits() {
                 sethabitList(prevHabitList => {
                     const newHabitList = [...prevHabitList];
                     newHabitList[index].completed = newCompletedStatus;
+                    setUpdate(!update);
                     return newHabitList;
                 });
             })
@@ -135,10 +138,11 @@ function Habits() {
         .then(response => {
             console.log('Data deleted successfully');
             sethabitList(prevHabitList => prevHabitList.filter((_, i) => i !== index));
+            setUpdate(!update);
         })
         .catch(error => {
             const errorMessage = Object.values(error.response.data);
-            console.error('Error posting data:', errorMessage);
+            console.error('Error deleting data:', errorMessage);
         });
         setMenuVisible(null);
     };
@@ -219,3 +223,15 @@ function Habits() {
 }
 
 export default Habits;
+
+
+
+
+
+
+
+
+
+
+
+

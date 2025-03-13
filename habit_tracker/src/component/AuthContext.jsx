@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
         const savedToken = localStorage.getItem('token');
         return savedToken ? JSON.parse(savedToken) : null;
     });
+    const [update, setUpdate] = useState(false);
 
     useEffect(() => {
         if (token) {
@@ -20,9 +21,8 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         localStorage.removeItem('token');
     };
-
     return (
-        <AuthContext.Provider value={{ token, setToken, logout }}>
+        <AuthContext.Provider value={{ token, setToken, logout, update, setUpdate }}>
             {children}
         </AuthContext.Provider>
     );

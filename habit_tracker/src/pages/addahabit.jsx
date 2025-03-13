@@ -5,6 +5,8 @@ import { AuthContext } from '../component/AuthContext';
 import axios from 'axios';
 
 function Addahabit({ onClose }) {
+    const {update} = useContext(AuthContext);
+    const { setUpdate } = useContext(AuthContext);
     const [name, setname] = useState("");
     const [recurring, setrecurring] = useState("");
     const [type, settype] = useState('True');
@@ -54,10 +56,11 @@ function Addahabit({ onClose }) {
         axios.post('http://localhost:8000/api/habits/create', addahabit, { headers })
             .then(response => {
                 console.log('Data posted successfully:', response.data);
+                setUpdate(!update);
                 onClose();
             })
             .catch(error => {
-                const errorMessage = Object.values(error.response.data)[0][0];
+                const errorMessage = Object.values(error.response.data);
                 console.error('Error posting data:', errorMessage);
                 setError(error.response.data.error);
             });

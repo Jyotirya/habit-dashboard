@@ -37,7 +37,7 @@ function Login() {
                 console.error('Error logging in:', error);
                 setError('Invalid credentials');
                 if (error.response) {
-                    const errorMessage = Object.values(error.response.data)[0][0];
+                    const errorMessage = Object.values(error.response.data);
                     setError(errorMessage);
                 } else {
                     setError('Invalid credentials');
